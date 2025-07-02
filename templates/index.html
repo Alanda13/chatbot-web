@@ -19,7 +19,7 @@
             max-width: 600px;
             background-color: #fff;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba[0](0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -57,6 +57,12 @@
             align-self: flex-start;
             margin-right: auto;
             text-align: left;
+        }
+        .message img { /* Estilo para as imagens dentro das mensagens */
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 5px;
         }
         .chat-input {
             display: flex;
@@ -110,7 +116,7 @@
             max-width: 100px;
             max-height: 100px;
             margin-top: 10px;
-            display: none; /* Escondido por padrão */
+            /* display: none; -> Removido, controlado pelo contêiner */
         }
         .image-preview-container {
             display: flex;
@@ -122,6 +128,7 @@
             border-top: 1px solid #eee;
             padding-top: 10px;
             background-color: #f9f9f9;
+            /* display: none; -> Adicionado via JS inicialmente */
         }
         .image-preview-container button {
             background-color: #dc3545;
@@ -173,26 +180,50 @@
             localStorage.setItem('chatbot_session_id', sessionId);
         }
 
-        function appendMessage(sender, text) {
+        // Função para adicionar mensagem (texto ou imagem)
+        function appendMessage(sender, content, isImage = false) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message', sender);
-            messageDiv.innerText = text;
+
+            if (isImage) {
+                const imgElement = document.createElement('img');
+                imgElement.src = content;
+                imgElement.alt = "Imagem enviada";
+                messageDiv.appendChild(imgElement);
+            } else {
+                messageDiv.innerText = content;
+            }
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight; // Rolar para o final
         }
 
         async function sendMessage() {
             const message = userInput.value.trim();
-            if (!message && !selectedImageBase64) {
+            const currentImageBase64 = selectedImageBase64; // Armazena a imagem para esta requisição
+
+            if (!message && !currentImageBase64) {
                 return; // Não envia mensagem vazia sem imagem
             }
 
-            appendMessage('user', message || 'Enviando imagem...'); // Mostra a mensagem do usuário
+            // Adiciona a mensagem do usuário (texto) ao chat
+            if (message) {
+                appendMessage('user', message);
+            }
+            // Adiciona a imagem do usuário ao chat
+            if (currentImageBase64) {
+                appendMessage('user', currentImageBase64, true); // true indica que é imagem
+            }
+            
+            // Texto de loading
+            appendMessage('bot', 'Digitando...', false); // Adiciona mensagem de "Digitando..."
 
             // Desabilita os inputs e botão para evitar envios múltiplos
             userInput.disabled = true;
             sendButton.disabled = true;
             imageUpload.disabled = true;
+            
+            // Remove a pré-visualização da imagem e limpa o input DEPOIS de adicionar ao chat
+            clearSelectedImage();
 
             try {
                 const response = await fetch('/chat', {
@@ -203,15 +234,27 @@
                     },
                     body: JSON.stringify({
                         message: message,
-                        image: selectedImageBase64 // Envia a imagem em Base64, se houver
+                        image: currentImageBase64 // Envia a imagem em Base64, se houver
                     })
                 });
 
                 const data = await response.json();
-                appendMessage('bot', data.response);
+                
+                // Remove a mensagem de "Digitando..." antes de adicionar a resposta real
+                const lastBotMessage = chatMessages.lastChild;
+                if (lastBotMessage && lastBotMessage.innerText === 'Digitando...') {
+                    chatMessages.removeChild(lastBotMessage);
+                }
+
+                appendMessage('bot', data.response); // Adiciona a resposta do bot
 
             } catch (error) {
                 console.error('Erro ao enviar mensagem:', error);
+                // Remove a mensagem de "Digitando..." em caso de erro
+                const lastBotMessage = chatMessages.lastChild;
+                if (lastBotMessage && lastBotMessage.innerText === 'Digitando...') {
+                    chatMessages.removeChild(lastBotMessage);
+                }
                 appendMessage('bot', 'Ops! Não consegui me conectar. Tente novamente.');
             } finally {
                 // Reabilita os inputs e botão
@@ -219,7 +262,6 @@
                 sendButton.disabled = false;
                 imageUpload.disabled = false;
                 userInput.value = ''; // Limpa o input
-                clearSelectedImage(); // Limpa a imagem selecionada após o envio
                 userInput.focus();
             }
         }
@@ -251,7 +293,7 @@
             }
         });
 
-        // Limpar imagem selecionada
+        // Limpar imagem selecionada na pré-visualização
         clearImageButton.addEventListener('click', clearSelectedImage);
 
         function clearSelectedImage() {
