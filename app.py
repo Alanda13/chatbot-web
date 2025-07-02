@@ -20,8 +20,23 @@ if not API_KEY_GEMINI:
 generai.configure(api_key=API_KEY_GEMINI)
 
 # Modelos Gemini
-model_text = generai.GenerativeModel("gemini-1.5-flash")
-model_vision = generai.GenerativeModel("gemini-1.5-flash")
+# Configuração para controle da geração de respostas (temperatura baixa para mais precisão)
+generation_config = {
+    "temperature": 0.2,  # Tente um valor baixo para respostas mais factuais
+    "top_p": 0.9,        # Parâmetro de amostragem
+    "top_k": 40,         # Parâmetro de amostragem
+    "max_output_tokens": 800, # Limite o tamanho da resposta em tokens
+}
+
+# Modelos Gemini
+model_text = generai.GenerativeModel(
+    model_name="gemini-1.5-flash",
+    generation_config=generation_config
+)
+model_vision = generai.GenerativeModel(
+    model_name="gemini-1.5-flash",
+    generation_config=generation_config
+)
 
 # Dicionário para armazenar o histórico de conversas por sessão (simples)
 chat_sessions = {}
