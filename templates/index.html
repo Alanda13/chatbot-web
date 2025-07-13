@@ -7,26 +7,21 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f0f2f5;
             margin: 0;
+            padding: 0;
+            background-color: #fce4ec;
+            height: 100vh;
+            width: 100vw;
         }
         .chat-container {
-            width: 90%;
-            max-width: 600px;
+            width: 100vw;
+            height: 100vh;
             background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
             display: flex;
             flex-direction: column;
-            height: 80vh;
         }
         .chat-header {
-            background-color: #4CAF50;
+            background-color: #ec407a; /* rosa forte */
             color: white;
             padding: 15px;
             text-align: center;
@@ -36,29 +31,33 @@
             flex-grow: 1;
             padding: 20px;
             overflow-y: auto;
-            background-color: #e9ebee;
+            background-color: #fce4ec;
+            display: flex; /* Adicionado para alinhar as mensagens */
+            flex-direction: column; /* Adicionado para alinhar as mensagens */
         }
         .message {
             margin-bottom: 10px;
-            padding: 8px 12px;
+            padding: 8px 12px; /* Pode ajustar este padding para reduzir o espaço interno */
             border-radius: 15px;
-            max-width: 70%;
+            max-width: fit-content; /* Faz a bolha da mensagem se ajustar ao conteúdo */
             word-wrap: break-word;
+            /* Adicionado para limitar o tamanho máximo para textos longos, sem deixar muito espaço para textos curtos */
+            max-width: 70%; /* Mantenha 70% como limite superior, mas 'fit-content' dará prioridade ao conteúdo */
         }
         .message.user {
-            background-color: #dcf8c6;
+            background-color: #f8bbd0; /* rosa claro */
             align-self: flex-end;
             margin-left: auto;
             text-align: right;
         }
         .message.bot {
-            background-color: #fff;
+            background-color: #e1bee7; /* lilás claro */
             border: 1px solid #ddd;
             align-self: flex-start;
             margin-right: auto;
             text-align: left;
         }
-        .message img { /* Estilo para as imagens dentro das mensagens */
+        .message img {
             max-width: 100%;
             height: auto;
             border-radius: 8px;
@@ -79,7 +78,7 @@
             font-size: 1em;
         }
         .chat-input button {
-            background-color: #4CAF50;
+            background-color: #ec407a;
             color: white;
             border: none;
             padding: 10px 15px;
@@ -89,7 +88,7 @@
             transition: background-color 0.3s;
         }
         .chat-input button:hover {
-            background-color: #45a049;
+            background-color: #ab47bc;
         }
         .file-upload {
             display: flex;
@@ -97,10 +96,10 @@
             margin-left: 10px;
         }
         .file-upload input[type="file"] {
-            display: none; /* Esconde o input de arquivo padrão */
+            display: none;
         }
         .file-upload label {
-            background-color: #007bff;
+            background-color: #ba68c8;
             color: white;
             padding: 10px 15px;
             border-radius: 20px;
@@ -110,13 +109,12 @@
             margin-right: 5px;
         }
         .file-upload label:hover {
-            background-color: #0056b3;
+            background-color: #8e24aa;
         }
         #preview-image {
             max-width: 100px;
             max-height: 100px;
             margin-top: 10px;
-            /* display: none; -> Removido, controlado pelo contêiner */
         }
         .image-preview-container {
             display: flex;
@@ -128,10 +126,9 @@
             border-top: 1px solid #eee;
             padding-top: 10px;
             background-color: #f9f9f9;
-            /* display: none; -> Adicionado via JS inicialmente */
         }
         .image-preview-container button {
-            background-color: #dc3545;
+            background-color: #f06292;
             color: white;
             border: none;
             padding: 5px 10px;
@@ -140,6 +137,7 @@
             font-size: 0.8em;
         }
     </style>
+
 </head>
 <body>
     <div class="chat-container">

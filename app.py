@@ -22,10 +22,10 @@ generai.configure(api_key=API_KEY_GEMINI)
 # Modelos Gemini
 # Configuração para controle da geração de respostas (temperatura baixa para mais precisão)
 generation_config = {
-    "temperature": 0.2,  # Tente um valor baixo para respostas mais factuais
-    "top_p": 0.9,        # Parâmetro de amostragem
-    "top_k": 40,         # Parâmetro de amostragem
-    "max_output_tokens": 800, # Limite o tamanho da resposta em tokens
+    "temperature": 0.2,  
+    "top_p": 0.9,       
+    "top_k": 40,        
+    "max_output_tokens": 800, 
 }
 
 # Modelos Gemini
@@ -38,7 +38,6 @@ model_vision = generai.GenerativeModel(
     generation_config=generation_config
 )
 
-# Dicionário para armazenar o histórico de conversas por sessão (simples)
 chat_sessions = {}
 
 # --- Rotas do Flask ---
