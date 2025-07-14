@@ -21,7 +21,7 @@
             flex-direction: column;
         }
         .chat-header {
-            background-color: #ec407a; /* rosa forte */
+            background-color: #ec407a; 
             color: white;
             padding: 15px;
             text-align: center;
@@ -32,26 +32,25 @@
             padding: 20px;
             overflow-y: auto;
             background-color: #fce4ec;
-            display: flex; /* Adicionado para alinhar as mensagens */
-            flex-direction: column; /* Adicionado para alinhar as mensagens */
+            display: flex; 
+            flex-direction: column; 
         }
         .message {
             margin-bottom: 10px;
-            padding: 8px 12px; /* Pode ajustar este padding para reduzir o espaço interno */
+            padding: 8px 12px; 
             border-radius: 15px;
-            max-width: fit-content; /* Faz a bolha da mensagem se ajustar ao conteúdo */
+            max-width: fit-content; 
             word-wrap: break-word;
-            /* Adicionado para limitar o tamanho máximo para textos longos, sem deixar muito espaço para textos curtos */
-            max-width: 70%; /* Mantenha 70% como limite superior, mas 'fit-content' dará prioridade ao conteúdo */
+            max-width: 70%; 
         }
         .message.user {
-            background-color: #f8bbd0; /* rosa claro */
+            background-color: #f8bbd0; 
             align-self: flex-end;
             margin-left: auto;
             text-align: right;
         }
         .message.bot {
-            background-color: #e1bee7; /* lilás claro */
+            background-color: #e1bee7; 
             border: 1px solid #ddd;
             align-self: flex-start;
             margin-right: auto;
@@ -170,15 +169,11 @@
         const imagePreviewContainer = document.getElementById('image-preview-container');
 
         let selectedImageBase64 = null; // Armazena a imagem em Base64
-
-        // Gera um ID de sessão simples (para fins de demonstração)
         let sessionId = localStorage.getItem('chatbot_session_id');
         if (!sessionId) {
             sessionId = 'session_' + Math.random().toString(36).substr(2, 9);
             localStorage.setItem('chatbot_session_id', sessionId);
         }
-
-        // Função para adicionar mensagem (texto ou imagem)
         function appendMessage(sender, content, isImage = false) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message', sender);
@@ -197,30 +192,25 @@
 
         async function sendMessage() {
             const message = userInput.value.trim();
-            const currentImageBase64 = selectedImageBase64; // Armazena a imagem para esta requisição
+            const currentImageBase64 = selectedImageBase64; 
 
             if (!message && !currentImageBase64) {
                 return; // Não envia mensagem vazia sem imagem
             }
-
-            // Adiciona a mensagem do usuário (texto) ao chat
             if (message) {
                 appendMessage('user', message);
             }
-            // Adiciona a imagem do usuário ao chat
             if (currentImageBase64) {
                 appendMessage('user', currentImageBase64, true); // true indica que é imagem
             }
             
             // Texto de loading
-            appendMessage('bot', 'Digitando...', false); // Adiciona mensagem de "Digitando..."
+            appendMessage('bot', 'Digitando...', false); 
 
-            // Desabilita os inputs e botão para evitar envios múltiplos
             userInput.disabled = true;
             sendButton.disabled = true;
             imageUpload.disabled = true;
             
-            // Remove a pré-visualização da imagem e limpa o input DEPOIS de adicionar ao chat
             clearSelectedImage();
 
             try {
@@ -228,17 +218,15 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-Session-ID': sessionId // Envia o ID da sessão
+                        'X-Session-ID': sessionId 
                     },
                     body: JSON.stringify({
                         message: message,
-                        image: currentImageBase64 // Envia a imagem em Base64, se houver
+                        image: currentImageBase64 
                     })
                 });
 
                 const data = await response.json();
-                
-                // Remove a mensagem de "Digitando..." antes de adicionar a resposta real
                 const lastBotMessage = chatMessages.lastChild;
                 if (lastBotMessage && lastBotMessage.innerText === 'Digitando...') {
                     chatMessages.removeChild(lastBotMessage);
@@ -248,33 +236,25 @@
 
             } catch (error) {
                 console.error('Erro ao enviar mensagem:', error);
-                // Remove a mensagem de "Digitando..." em caso de erro
                 const lastBotMessage = chatMessages.lastChild;
                 if (lastBotMessage && lastBotMessage.innerText === 'Digitando...') {
                     chatMessages.removeChild(lastBotMessage);
                 }
                 appendMessage('bot', 'Ops! Não consegui me conectar. Tente novamente.');
             } finally {
-                // Reabilita os inputs e botão
                 userInput.disabled = false;
                 sendButton.disabled = false;
                 imageUpload.disabled = false;
-                userInput.value = ''; // Limpa o input
+                userInput.value = ''; 
                 userInput.focus();
             }
         }
-
-        // Evento para o botão de enviar
         sendButton.addEventListener('click', sendMessage);
-
-        // Evento para enviar com a tecla Enter
         userInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 sendMessage();
             }
         });
-
-        // Pré-visualização da imagem
         imageUpload.addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (file) {
@@ -282,27 +262,23 @@
                 reader.onload = function(e) {
                     previewImage.src = e.target.result;
                     previewImage.style.display = 'block';
-                    imagePreviewContainer.style.display = 'flex'; // Mostra o contêiner
-                    selectedImageBase64 = e.target.result; // Armazena a imagem em Base64
+                    imagePreviewContainer.style.display = 'flex'; 
+                    selectedImageBase64 = e.target.result; 
                 };
                 reader.readAsDataURL(file);
             } else {
                 clearSelectedImage();
             }
         });
-
-        // Limpar imagem selecionada na pré-visualização
         clearImageButton.addEventListener('click', clearSelectedImage);
 
         function clearSelectedImage() {
             previewImage.src = '#';
             previewImage.style.display = 'none';
             imagePreviewContainer.style.display = 'none';
-            imageUpload.value = ''; // Limpa o input file
-            selectedImageBase64 = null; // Limpa a variável Base64
+            imageUpload.value = ''; 
+            selectedImageBase64 = null; 
         }
-
-        // Mensagem inicial do bot
         appendMessage('bot', 'Olá! Como posso ajudar você hoje?');
 
     </script>
